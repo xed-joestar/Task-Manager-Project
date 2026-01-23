@@ -2,32 +2,25 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import authRoutes from "./routes/auth.route.js";
 
 dotenv.config();
-console.log("MONGO_URI =", process.env.MONGO_URI);
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error("Error connecting to MongoDB:", err);
-  });
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error(err));
 
-const app = express(); // ✅ initialize FIRST
+const app = express();
 
-// middleware to handle cors
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
+// middleware
+app.use(cors());
 app.use(express.json());
 
+// ✅ REGISTER ROUTES BEFORE listen
+app.use("/api/auth", authRoutes);
+
+// ✅ START SERVER LAST
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
